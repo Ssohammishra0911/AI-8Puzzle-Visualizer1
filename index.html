@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8-Puzzle AI Search Visualizer</title>
+  <meta name="description" content="Interactive 8-Puzzle solver that animates BFS, DFS, Depth Limited Search, IDDLS, UCS, Greedy Best First Search and A* search.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================= Navigation ================= -->
+<nav class="navbar navbar-expand-md navbar-dark app-nav sticky-top" aria-label="Main navigation">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#home">
+      <img src="assets/favicon.svg" alt="" width="28" height="28">
+      <span>8-Puzzle AI</span>
+    </a>
+    <button class="navbar-toggler" type="button" id="navToggle" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" data-page="home" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" data-page="solver" href="#solver">Solver</a></li>
+        <li class="nav-item"><a class="nav-link" data-page="compare" href="#compare">Comparison</a></li>
+        <li class="nav-item"><a class="nav-link" data-page="algorithms" href="#algorithms">Algorithm Info</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+
+  <!-- ================= HOME ================= -->
+  <section id="page-home" class="page">
+    <div class="hero card border-0 mb-4">
+      <div class="card-body p-4 p-md-5">
+        <p class="eyebrow mb-2" data-cfg="course"></p>
+        <h1 class="display-6 fw-bold mb-2" data-cfg="assignmentTitle"></h1>
+        <p class="text-muted mb-4" data-cfg="assignmentType"></p>
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-lg-3"><div class="id-box"><span>Student name</span><b data-cfg="studentName"></b></div></div>
+          <div class="col-sm-6 col-lg-3"><div class="id-box"><span>Registration number</span><b data-cfg="regNo"></b></div></div>
+          <div class="col-sm-6 col-lg-3"><div class="id-box"><span>Course</span><b data-cfg="course"></b></div></div>
+          <div class="col-sm-6 col-lg-3"><div class="id-box id-box-accent"><span>Assigned algorithm</span><b data-cfg="assignedName"></b></div></div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="#solver" class="btn btn-primary btn-lg">Open the Solver</a>
+          <a href="#compare" class="btn btn-outline-primary btn-lg">Compare algorithms</a>
+          <a href="#algorithms" class="btn btn-outline-secondary btn-lg">Algorithm info</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card panel h-100">
+          <div class="card-header">Introduction to the 8-Puzzle problem</div>
+          <div class="card-body">
+            <p>
+              The 8-puzzle is a sliding-tile puzzle on a 3×3 board holding eight numbered tiles and one empty
+              square (the <em>blank</em>). A move slides a tile that is next to the blank into it, which is the
+              same as moving the blank up, down, left or right. The task is to turn a given <em>initial state</em>
+              into a given <em>goal state</em> using as few moves as possible.
+            </p>
+            <h2 class="h6 fw-bold mt-4">Formulated as a state-space search problem</h2>
+            <ul class="mb-3">
+              <li><b>State:</b> an arrangement of the tiles 1–8 and the blank on the board.</li>
+              <li><b>Initial / goal state:</b> chosen by the user.</li>
+              <li><b>Actions:</b> move the blank Up, Down, Left or Right, when the move stays on the board.</li>
+              <li><b>Transition model:</b> swap the blank with the neighbouring tile.</li>
+              <li><b>Path cost:</b> 1 per move, so the cost of a solution is its number of moves.</li>
+            </ul>
+            <h2 class="h6 fw-bold">Facts worth knowing</h2>
+            <ul class="mb-0">
+              <li>There are 9! = 362,880 arrangements, but only <b>181,440</b> of them are reachable from any given state.</li>
+              <li>Two states are mutually reachable exactly when they have the same <b>inversion parity</b>. This app uses that test to reject unsolvable puzzles and to generate random solvable ones.</li>
+              <li>The average branching factor is about <b>2.67</b> (2 moves with the blank in a corner, 3 on an edge, 4 in the centre).</li>
+              <li>The hardest puzzles need <b>31</b> moves.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card panel mb-4">
+          <div class="card-header">Example from the assignment</div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-around align-items-center gap-3 text-center">
+              <div><div class="small text-muted mb-1">Initial state</div><div id="homeIni"></div></div>
+              <div class="fs-2 text-muted">→</div>
+              <div><div class="small text-muted mb-1">Goal state</div><div id="homeGoal"></div></div>
+            </div>
+            <p class="small text-muted mt-3 mb-0">The shortest solution takes 5 moves. Try it in the Solver: Depth Limited Search with limit 4 reports a <b>cutoff</b>, with limit 5 it finds the solution.</p>
+          </div>
+        </div>
+        <div class="card panel">
+          <div class="card-header">What this app does</div>
+          <div class="card-body">
+            <ul class="feature-list mb-0">
+              <li>Enter your own puzzle or generate a random solvable one</li>
+              <li>Run BFS, DFS, DLS, IDDLS, UCS, GBFS or A*</li>
+              <li>Animates the blank tile and every search step</li>
+              <li>Live frontier, explored list, h(n), g(n), f(n)</li>
+              <li>Run / Pause / Resume / Step / Reset / Speed controls</li>
+              <li>Side-by-side comparison of all algorithms</li>
+              <li>Documentation for every algorithm and heuristic</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SOLVER ================= -->
+  <section id="page-solver" class="page d-none">
+    <div class="row g-4">
+
+      <!-- Left column: inputs -->
+      <div class="col-lg-4">
+        <div class="card panel mb-4">
+          <div class="card-header"><span class="step-no">1</span> Puzzle input</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label small fw-semibold">Initial state</label>
+                <div id="iniGrid" class="grid-input" role="group" aria-label="Initial state"></div>
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold">Goal state</label>
+                <div id="goalGrid" class="grid-input" role="group" aria-label="Goal state"></div>
+              </div>
+            </div>
+            <p class="form-text mt-2 mb-3">Use digits 1–8 once each, and <b>_</b> (or 0) for the blank.</p>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <button id="btnApply" type="button" class="btn btn-outline-primary btn-sm">Apply</button>
+              <button id="btnRandom" type="button" class="btn btn-primary btn-sm">Generate Random Puzzle</button>
+              <button id="btnStdGoal" type="button" class="btn btn-outline-secondary btn-sm">Standard goal</button>
+              <button id="btnExample" type="button" class="btn btn-outline-secondary btn-sm">Assignment example</button>
+            </div>
+            <div class="row g-2 align-items-center">
+              <div class="col-auto"><label for="scrambleMoves" class="col-form-label small">Random scramble (moves)</label></div>
+              <div class="col-auto"><input id="scrambleMoves" type="number" class="form-control form-control-sm" min="1" max="60" value="12" style="width:5rem"></div>
+            </div>
+            <div id="inputMsg" class="mt-3" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="card panel mb-4">
+          <div class="card-header"><span class="step-no">2</span> Algorithm selection</div>
+          <div class="card-body">
+            <label for="algoSelect" class="form-label small fw-semibold">Algorithm</label>
+            <select id="algoSelect" class="form-select mb-2">
+              <optgroup label="Uninformed search">
+                <option value="bfs">Breadth First Search (BFS)</option>
+                <option value="dfs">Depth First Search (DFS)</option>
+                <option value="dls" selected>Depth Limited Search (DLS)</option>
+                <option value="iddls">Iterative Deepening DLS (IDDLS)</option>
+                <option value="ucs">Uniform Cost Search (UCS)</option>
+              </optgroup>
+              <optgroup label="Informed search">
+                <option value="gbfs">Greedy Best First Search (GBFS)</option>
+                <option value="astar">A* Search</option>
+              </optgroup>
+            </select>
+            <p id="algoNote" class="small text-muted"></p>
+
+            <div id="dlsParam" class="mb-3">
+              <label for="dlsLimit" class="form-label small fw-semibold">Depth limit (DLS)</label>
+              <input id="dlsLimit" type="number" class="form-control" min="0" max="60" value="5">
+              <div class="form-text">Nodes at this depth are not expanded. Too small a limit gives a <b>cutoff</b>.</div>
+            </div>
+            <div id="iddlsParam" class="mb-3 d-none">
+              <label for="iddlsMax" class="form-label small fw-semibold">Maximum depth limit (IDDLS)</label>
+              <input id="iddlsMax" type="number" class="form-control" min="0" max="60" value="31">
+              <div class="form-text">IDDLS tries limits 0, 1, 2, … up to this value.</div>
+            </div>
+            <div id="heurParam" class="mb-3 d-none">
+              <label for="heuristicSelect" class="form-label small fw-semibold">Heuristic h(n)</label>
+              <select id="heuristicSelect" class="form-select">
+                <option value="manhattan">Manhattan Distance</option>
+                <option value="misplaced">Misplaced Tiles</option>
+              </select>
+            </div>
+
+            <label for="speedRange" class="form-label small fw-semibold mb-0">Animation speed</label>
+            <input id="speedRange" type="range" class="form-range" min="1" max="10" value="4">
+            <div id="speedLabel" class="form-text mt-0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: visualisation -->
+      <div class="col-lg-8">
+        <div class="card panel mb-4">
+          <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span><span class="step-no">3</span> Puzzle visualisation</span>
+            <span id="phaseBadge" class="badge text-bg-secondary">Ready</span>
+          </div>
+          <div class="card-body">
+            <div class="controls mb-3" role="group" aria-label="Playback controls">
+              <button id="btnRun" type="button" class="btn btn-success">▶ Run</button>
+              <button id="btnPause" type="button" class="btn btn-warning" disabled>⏸ Pause</button>
+              <button id="btnResume" type="button" class="btn btn-outline-success" disabled>⏵ Resume</button>
+              <button id="btnPrev" type="button" class="btn btn-outline-primary" disabled>◀ Previous Step</button>
+              <button id="btnNext" type="button" class="btn btn-outline-primary">Next Step ▶</button>
+              <button id="btnReset" type="button" class="btn btn-outline-danger">⟲ Reset</button>
+              <button id="btnToSolution" type="button" class="btn btn-outline-secondary btn-sm" disabled>Jump to solution</button>
+              <button id="btnToEnd" type="button" class="btn btn-outline-secondary btn-sm" disabled>Jump to end</button>
+            </div>
+            <div id="busy" class="alert alert-info py-2 d-none" role="status"></div>
+            <input id="scrubber" type="range" class="form-range" min="0" max="0" value="0" disabled aria-label="Playback position">
+            <div id="stepLabel" class="small text-muted mb-3">Press <b>Run</b> to start, or <b>Next Step</b> to step through manually.</div>
+
+            <div class="row g-4 align-items-start">
+              <div class="col-md-6 text-center">
+                <div class="small fw-semibold text-muted mb-2">CURRENT STATE</div>
+                <div id="mainBoard" aria-label="Current puzzle state"></div>
+                <div id="moveLabel" class="move-label mt-2"></div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex gap-4 mb-3">
+                  <div><div class="small fw-semibold text-muted mb-1">INITIAL STATE</div><div id="iniMini"></div></div>
+                  <div><div class="small fw-semibold text-muted mb-1">GOAL STATE</div><div id="goalMini"></div></div>
+                </div>
+                <div class="small fw-semibold text-muted mb-1">LIVE SEARCH INFORMATION</div>
+                <div id="metrics" class="metrics"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card panel mb-4">
+          <div class="card-header"><span class="step-no">4</span> Generated successor states <small class="text-muted fw-normal">(of the node being expanded)</small></div>
+          <div class="card-body"><div id="successors" class="succ-row"></div></div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="card panel h-100">
+              <div class="card-header d-flex justify-content-between flex-wrap gap-1">Frontier (open list) <small id="frontierCount" class="text-muted fw-normal"></small></div>
+              <div class="card-body"><div id="frontierList" class="chips"></div></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card panel h-100">
+              <div class="card-header d-flex justify-content-between flex-wrap gap-1">Explored (closed list) <small id="exploredCount" class="text-muted fw-normal"></small></div>
+              <div class="card-body"><div id="exploredList" class="chips"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card panel mb-4">
+          <div class="card-header"><span class="step-no">5</span> Final solution path</div>
+          <div class="card-body">
+            <div id="pathNote" class="small text-muted mb-2">The solution path appears here once the goal is reached.</div>
+            <div id="pathStrip" class="path-strip"></div>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <div class="card-header"><span class="step-no">6</span> Solution summary</div>
+          <div class="card-body"><div id="summary"><span class="text-muted">The summary appears when the search finishes.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COMPARISON ================= -->
+  <section id="page-compare" class="page d-none">
+    <div class="card panel mb-4">
+      <div class="card-header">Algorithm comparison on the same puzzle</div>
+      <div class="card-body">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-auto">
+            <div class="d-flex gap-4">
+              <div><div class="small fw-semibold text-muted mb-1">INITIAL STATE</div><div id="cmpIni"></div></div>
+              <div><div class="small fw-semibold text-muted mb-1">GOAL STATE</div><div id="cmpGoal"></div></div>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="row g-3 align-items-end">
+              <div class="col-auto">
+                <label for="cmpLimit" class="form-label small fw-semibold">DLS depth limit</label>
+                <input id="cmpLimit" type="number" class="form-control form-control-sm" min="0" max="60" value="5" style="width:6rem">
+              </div>
+              <div class="col-auto">
+                <label for="cmpMax" class="form-label small fw-semibold">IDDLS max limit</label>
+                <input id="cmpMax" type="number" class="form-control form-control-sm" min="0" max="60" value="31" style="width:6rem">
+              </div>
+              <div class="col-auto d-flex flex-wrap gap-2">
+                <button id="btnRunAll" type="button" class="btn btn-success">▶ Run all algorithms</button>
+                <button id="btnCmpRandom" type="button" class="btn btn-outline-primary">New random puzzle</button>
+                <a href="#solver" class="btn btn-outline-secondary">Edit puzzle in Solver</a>
+              </div>
+            </div>
+            <div id="cmpProgress" class="small text-muted mt-2" aria-live="polite"></div>
+            <div id="cmpMsg" class="mt-2" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card panel mb-4">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 cmp-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th><th>Solution found</th><th class="text-end">Nodes generated</th>
+              <th class="text-end">Nodes expanded</th><th class="text-end">Moves</th>
+              <th class="text-end">Max depth</th><th class="text-end">Time</th><th>Memory (approx.)</th><th>Optimal</th>
+            </tr>
+          </thead>
+          <tbody id="cmpBody">
+            <tr><td colspan="9" class="text-center text-muted py-4">Press <b>Run all algorithms</b> to fill the table.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div id="cmpNotes"></div>
+  </section>
+
+  <!-- ================= ALGORITHM INFO ================= -->
+  <section id="page-algorithms" class="page d-none">
+    <h1 class="h3 fw-bold mb-1">Algorithm information</h1>
+    <p class="text-muted">Notation: b = branching factor (≈ 2.67 on average here), d = depth of the shallowest solution, m = maximum depth of the tree, l = depth limit, C* = optimal cost.</p>
+    <div id="algoInfo" class="mb-4"></div>
+    <h2 class="h4 fw-bold mb-3">Heuristic functions</h2>
+    <div id="heurInfo" class="row g-3"></div>
+  </section>
+
+</main>
+
+<footer class="app-footer text-center small">
+  <span data-cfg="course"></span> · <span data-cfg="studentName"></span> · <span data-cfg="regNo"></span>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/puzzle.js"></script>
+<script src="js/heuristics.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/info.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
