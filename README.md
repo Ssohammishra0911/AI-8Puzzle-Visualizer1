@@ -107,7 +107,7 @@ AI-8Puzzle-Visualizer/
 
 | | |
 |---|---|
-| Name | YOUR FULL NAME |
+| Name | Soham Mishra |
 | Registration number | 24BCI0124 |
 | Course | Artificial Intelligence |
 | Assigned algorithm | Depth Limited Search (algorithm no. 3) |
