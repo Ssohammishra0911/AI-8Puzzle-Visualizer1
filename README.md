@@ -3,8 +3,8 @@
 **Interactive 8-Puzzle Problem Solver using AI Search Algorithms**
 Course: Artificial Intelligence · Digital Assignment (Case Study) · Individual
 
-🔗 **Live site (GitHub Pages):** https://SohamMishra.github.io/AI-8Puzzle-Visualizer
-📦 **Repository:** https://github.com/SohamMishra-USERNAME/AI-8Puzzle-Visualizer
+🚀 **LIVE DEMO:** https://ssohammishra0911.github.io/AI-8Puzzle-Visualizer1/
+📦 **SOURCE CODE:** https://github.com/Ssohammishra0911/AI-8Puzzle-Visualizer1
 
 ---
 
