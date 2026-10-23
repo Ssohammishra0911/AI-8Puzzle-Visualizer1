@@ -4,6 +4,7 @@
 Course: Artificial Intelligence · Digital Assignment (Case Study) · Individual
 
 🚀 **LIVE DEMO:** https://ssohammishra0911.github.io/AI-8Puzzle-Visualizer1/
+
 📦 **SOURCE CODE:** https://github.com/Ssohammishra0911/AI-8Puzzle-Visualizer1
 
 ---
